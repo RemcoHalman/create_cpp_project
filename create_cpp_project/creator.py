@@ -5,17 +5,26 @@ import sys  # Needed for sys.exit()
 def create_folder_structure(project_name, setup_type='full'):
     """
     Creates a directory structure for a new C++ project with the specified project name.
-    
+    If project_name is '.', use the current directory.
+
     :param project_name: Name of the project for which to create the structure.
     :param setup_type: Type of setup ('full' or 'simple')
     """
 
-    project_path = os.path.abspath(project_name)
-
-    # Check if the directory already exists
-    if os.path.exists(project_path):
-        print(f"Error: Folder already exists at {project_path}")
-        sys.exit(1)  # Exit with an error code
+    if project_name == '.':
+        project_name = os.getcwd()  # Get current working directory
+        # Optionally, you could check if it's empty before proceeding
+        # Get only the name of the current directory
+        if os.listdir(project_name):
+            print(f"Error: Current directory is not empty at {project_name}")
+            sys.exit(1)
+    else:
+        project_name = os.path.abspath(project_name)
+        # Check if the directory already exists
+        if os.path.exists(project_name):
+            print(f"Error: Folder already exists at {project_name}")
+            sys.exit(1)
+        os.makedirs(project_name, exist_ok=True)  # Create the project directory only if not current directory
 
     # Define the directories for both setup types
     base_directories = [
@@ -43,7 +52,7 @@ def create_folder_structure(project_name, setup_type='full'):
 
         # Create initial README.md for the project
     with open(f"{project_name}/README.md", "w") as f:
-        f.write(f"# {project_name}\n\nThis is the base directory for the {project_name} project. \nSetup type: {setup_type}")
+        f.write(f"# CPP Template folder\n\nThis is the base directory for the project. \nSetup type: {setup_type}")
 
     # Create other specific files (Makefile, main.cpp, etc.)
     with open(f"{project_name}/src/main.cpp", "w") as f:
@@ -64,8 +73,9 @@ def main():
     """
     Main function to handle command line arguments and create the project structure.
     """
-    parser = argparse.ArgumentParser(description="Create C++ project structure.")
-    parser.add_argument("project_name", type=str, help="Name of the project")
+    parser = argparse.ArgumentParser(description="Creates a basic C++ folder structure that I was missing during my learning experience")
+    parser.add_argument("project_name", type=str, help="Name of the project or '.' for current directory")
+    # parser.add_argument("Create CPP Project", type=str, help="Creates a basic C++ folder structure that I was missing during my learning experience")
     parser.add_argument("--setup_type", type=str, choices=['full', 'simple'], default='full', help="Type of project setup (full or simple)")
 
     args = parser.parse_args()
